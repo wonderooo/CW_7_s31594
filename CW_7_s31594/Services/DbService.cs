@@ -5,35 +5,43 @@ namespace VetSqlClient.Services;
 
 public interface IDbService
 {
-    public Task<IEnumerable<ClientGetDTO>> GetClientDetailsAsync();
+    public Task<ClientGetDTO> GetClientDetailsAsync(int id);
     public Task<IEnumerable<TripGetDTO>> GetTripsDetailsAsync();
-
+    public Task<ClientCreateDTO> CreateClientAsync(ClientCreateDTO dto);
+    
 }
 
 public class DbService(IConfiguration config) : IDbService
 {
     private readonly string? _connectionString = config.GetConnectionString("Default");
     
-    public async Task<IEnumerable<ClientGetDTO>> GetClientDetailsAsync()
+    public async Task<ClientGetDTO> GetClientDetailsAsync(int id)
     {
-        var result = new List<ClientGetDTO>();
-        
+        var results = new List<ClientGetDTO>();
+
         await using var connection = new SqliteConnection(_connectionString);
-        const string sql = "select IdClient, FirstName from Client";
+        const string sql = "SELECT IdClient, FirstName, LastName, Email, Telephone, Pesel FROM Client WHERE IdClient = @id";
         await using var command = new SqliteCommand(sql, connection);
+        command.Parameters.AddWithValue("@id", id);
+
         await connection.OpenAsync();
         await using var reader = await command.ExecuteReaderAsync();
         while (await reader.ReadAsync())
         {
-            result.Add(new ClientGetDTO
+            results.Add(new ClientGetDTO
             {
                 Id = reader.GetInt32(0),
                 FirstName = reader.GetString(1),
+                LastName = reader.GetString(2),
+                Email = reader.GetString(3),
+                Telephone = reader.GetString(4),
+                Pesel = reader.GetString(5),
             });
         }
 
-        return result;
+        return results[0];
     }
+
     
     public async Task<IEnumerable<TripGetDTO>> GetTripsDetailsAsync()
     {
@@ -83,5 +91,21 @@ public class DbService(IConfiguration config) : IDbService
         }
 
         return result.Values;
+    }
+    
+    public async Task<ClientCreateDTO> CreateClientAsync(ClientCreateDTO dto)
+    {
+        await using var connection = new SqliteConnection(_connectionString);
+        const string sql = "insert into Client (FirstName, LastName, Email, Telephone, Pesel) values (@f, @l, @e, @t, @p);";
+        await using var command = new SqliteCommand(sql, connection);
+        command.Parameters.AddWithValue("@f", dto.FirstName);
+        command.Parameters.AddWithValue("@l", dto.LastName);
+        command.Parameters.AddWithValue("@e", dto.Email);
+        command.Parameters.AddWithValue("@t", dto.Telephone);
+        command.Parameters.AddWithValue("@p", dto.Pesel);
+        await connection.OpenAsync();
+        await command.ExecuteScalarAsync();
+
+        return dto;
     }
 }

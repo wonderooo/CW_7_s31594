@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VetSqlClient", "VetSqlClient\VetSqlClient.csproj", "{E87EA0D0-95A4-463E-A85D-A2944FE56357}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CW_7_s31594", "CW_7_s31594\CW_7_s31594.csproj", "{E87EA0D0-95A4-463E-A85D-A2944FE56357}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
