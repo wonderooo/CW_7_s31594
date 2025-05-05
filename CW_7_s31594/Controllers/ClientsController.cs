@@ -20,4 +20,16 @@ public class ClientsController(IDbService dbService) : ControllerBase
         await dbService.CreateClientAsync(dto);
         return Created();
     }
+
+    [HttpPut("{id}/trips/{tripId}")]
+    public Task<IActionResult> UpdateClient([FromRoute] int id, [FromRoute] int tripId)
+    {
+        return dbService.RegisterClientForTripAsync(id, tripId);
+    }
+
+    [HttpDelete("{id}/trips/{tripId}")]
+    public Task<IActionResult> DeleteClientTrip([FromRoute] int id, [FromRoute] int tripId)
+    {
+        return dbService.UnregisterClientFromTripAsync(id, tripId);
+    }
 }
